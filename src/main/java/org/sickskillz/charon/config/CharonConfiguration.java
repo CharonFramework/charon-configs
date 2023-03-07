@@ -21,6 +21,7 @@
 package org.sickskillz.charon.config;
 
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.sickskillz.charon.exceptions.DefaultConfigFileLoadException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,17 +39,21 @@ public class CharonConfiguration extends YamlConfiguration {
     public CharonConfiguration(String fileName) {
         Objects.requireNonNull(fileName, "fileName cannot be null");
         try (InputStream resourceStream = CharonConfiguration.class.getResourceAsStream("/" + fileName)) {
-            Objects.requireNonNull(resourceStream, "Unable to load the default config from your jar file using filename "
-                    + fileName + ". Make sure that the file exists in your jar file by having it at the root of your resources folder!");
+            if (resourceStream == null) {
+                throw new DefaultConfigFileLoadException("Unable to load the default config from your jar file using filename "
+                        + fileName + ". Make sure that the file exists in your jar file by having it at the root of your resources folder!");
+            }
 
             try (InputStreamReader reader = new InputStreamReader(resourceStream, StandardCharsets.UTF_8)) {
                 this.defaultConfig = YamlConfiguration.loadConfiguration(reader);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DefaultConfigFileLoadException("Unable to load the default config: " + e);
         }
 
-        Objects.requireNonNull(this.defaultConfig, "Unable to load the default config for an unknown reason!");
+        if (this.defaultConfig == null) {
+            throw new DefaultConfigFileLoadException();
+        }
     }
 
     public List<String> getVerificationExclusion() {
