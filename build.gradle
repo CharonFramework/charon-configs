@@ -19,8 +19,8 @@ dependencies {
 
 sonarqube {
     properties {
-        property "sonar.projectKey", "SickSkillz_Charon"
-        property "sonar.organization", "sickskillz-github"
+        property "sonar.projectKey", "CharonFramework_configs"
+        property "sonar.organization", "charonframework"
         property "sonar.host.url", "https://sonarcloud.io"
     }
 }
