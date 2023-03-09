@@ -18,39 +18,32 @@
  * along with Charon.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.sickskillz.charon.validators;
+package org.sickskillz.charon;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiFunction;
+import java.util.Objects;
 
-@SuperBuilder
-@AllArgsConstructor
-@NoArgsConstructor
-@NotNull
-public abstract class Validator {
+public class CharonConfigs {
 
-    @Getter
-    @Setter
-    protected @Nullable BiFunction<String, Object, Void> errorCallback;
+    private CharonConfigs() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
 
-    protected abstract boolean isValueValid(Object value);
+    private static @Nullable Plugin plugin = null;
 
-    public boolean isValid(String path, Object value) {
-        if (isValueValid(value)) {
-            return true;
+    public static void init(@NotNull Plugin plugin) {
+        Objects.requireNonNull(plugin);
+        CharonConfigs.plugin = plugin;
+    }
+
+    public static @NotNull Plugin getPlugin() {
+        if (plugin == null) {
+            throw new IllegalStateException("Charon has not been initialized yet! You have to initialize it first by calling Charon.init(plugin)");
         }
 
-        if (errorCallback != null) {
-            errorCallback.apply(path, value);
-        }
-
-        return false;
+        return plugin;
     }
 }

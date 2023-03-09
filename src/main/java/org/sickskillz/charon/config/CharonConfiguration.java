@@ -20,24 +20,37 @@
 
 package org.sickskillz.charon.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
+import org.sickskillz.charon.CharonConfigs;
+import org.sickskillz.charon.exceptions.ConfigUpdateException;
 import org.sickskillz.charon.exceptions.DefaultConfigFileLoadException;
+import org.sickskillz.charon.validators.DefaultValidators;
+import org.sickskillz.charon.validators.Validator;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
+@Getter
+@Setter
 public class CharonConfiguration extends YamlConfiguration {
 
-    private List<String> verificationExclusion = new ArrayList<>();
-    private YamlConfiguration defaultConfig;
+    private @NotNull List<String> verificationExclusion = new ArrayList<>();
+    private final @NotNull YamlConfiguration defaultConfig;
 
-    public CharonConfiguration(String fileName) {
+    private final @NotNull File configFile;
+
+    private @NotNull DefaultValidators defaultValidators = new DefaultValidators();
+
+    public CharonConfiguration(@NotNull String fileName) {
         Objects.requireNonNull(fileName, "fileName cannot be null");
+
         try (InputStream resourceStream = CharonConfiguration.class.getResourceAsStream("/" + fileName)) {
             if (resourceStream == null) {
                 throw new DefaultConfigFileLoadException("Unable to load the default config from your jar file using filename "
@@ -51,24 +64,110 @@ public class CharonConfiguration extends YamlConfiguration {
             throw new DefaultConfigFileLoadException("Unable to load the default config: " + e);
         }
 
-        if (this.defaultConfig == null) {
-            throw new DefaultConfigFileLoadException();
+        configFile = new File(CharonConfigs.getPlugin().getDataFolder(), fileName);
+
+        if (!configFile.exists()) {
+            CharonConfigs.getPlugin().saveResource(fileName, false);
         }
     }
 
-    public List<String> getVerificationExclusion() {
-        return verificationExclusion;
-    }
-
-    public void setVerificationExclusion(List<String> verificationExclusion) {
-        this.verificationExclusion = verificationExclusion;
-    }
-
-    public void addVerificationExclusion(String verificationExclusion) {
+    public void addVerificationExclusion(@NotNull String verificationExclusion) {
+        Objects.requireNonNull(verificationExclusion);
         this.verificationExclusion.add(verificationExclusion);
     }
 
-    public void removeVerificationExclusion(String verificationExclusion) {
+    public void removeVerificationExclusion(@NotNull String verificationExclusion) {
+        Objects.requireNonNull(verificationExclusion);
         this.verificationExclusion.remove(verificationExclusion);
+    }
+
+    public boolean isExcludedFromVerification(@NotNull String key) {
+        Objects.requireNonNull(key);
+
+        for (String exclusion : verificationExclusion) {
+            if (key.startsWith(exclusion)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public Object get(@NotNull String path) {
+        Objects.requireNonNull(path);
+        Object object = super.get(path);
+
+        if (object == null) {
+            object = this.defaultConfig.get(path);
+
+            if (object != null) {
+                this.set(path, object);
+
+                try {
+                    this.save(configFile);
+                } catch (IOException e) {
+                    throw new ConfigUpdateException("Unable to save the config for an unknown reason! " + e);
+                }
+            } else {
+                throw new NullPointerException("Unable to find the key " + path + " in the default config file, while it is also missing in the config file on the disk!");
+            }
+        }
+
+        return object;
+    }
+
+    public @NotNull Optional<Object> get(@NotNull String path, @NotNull Validator validator) {
+        Objects.requireNonNull(path);
+        Objects.requireNonNull(validator);
+
+        Object value = this.get(path);
+
+        if (value != null && validator.isValid(path, value)) {
+            return Optional.of(value);
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public int getInt(@NotNull String path) {
+        Objects.requireNonNull(path);
+
+        return this.getInt(path, 0);
+    }
+
+    @Override
+    public int getInt(@NotNull String path, int def) {
+        Objects.requireNonNull(path);
+        Optional<Object> value = this.get(path, defaultValidators.getDefaultIntegerValidator());
+
+        return value.map(o -> (int) o).orElse(def);
+
+    }
+
+    public @NotNull List<String> updateConfig() {
+        List<String> updatedKeys = new ArrayList<>();
+
+        for (String key : this.defaultConfig.getConfigurationSection("").getKeys(true)) {
+            if (this.isExcludedFromVerification(key)) {
+                continue;
+            }
+
+            if (super.get(key) == null) {
+                Object defaultValue = this.defaultConfig.get(key);
+
+                this.set(key, defaultValue);
+                updatedKeys.add(key);
+            }
+        }
+
+        try {
+            this.save(configFile);
+        } catch (IOException e) {
+            throw new ConfigUpdateException("Unable to save the config for an unknown reason! " + e);
+        }
+
+        return updatedKeys;
     }
 }

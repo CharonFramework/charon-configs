@@ -18,39 +18,26 @@
  * along with Charon.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.sickskillz.charon.validators;
+package org.sickskillz.charon.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiFunction;
+import java.util.Objects;
 
-@SuperBuilder
-@AllArgsConstructor
-@NoArgsConstructor
-@NotNull
-public abstract class Validator {
+public class TypeUtils {
 
-    @Getter
-    @Setter
-    protected @Nullable BiFunction<String, Object, Void> errorCallback;
+    private TypeUtils() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
 
-    protected abstract boolean isValueValid(Object value);
+    public static boolean isInteger(@NotNull String input) {
+        Objects.requireNonNull(input);
 
-    public boolean isValid(String path, Object value) {
-        if (isValueValid(value)) {
+        try {
+            Integer.parseInt(input);
             return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
-
-        if (errorCallback != null) {
-            errorCallback.apply(path, value);
-        }
-
-        return false;
     }
 }

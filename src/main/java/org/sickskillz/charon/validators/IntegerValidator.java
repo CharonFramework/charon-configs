@@ -21,36 +21,52 @@
 package org.sickskillz.charon.validators;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.sickskillz.charon.utils.TypeUtils;
 
+import java.util.Objects;
 import java.util.function.BiFunction;
 
-@SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
-@NotNull
-public abstract class Validator {
+@AllArgsConstructor
+@SuperBuilder
+public class IntegerValidator extends Validator {
 
-    @Getter
-    @Setter
-    protected @Nullable BiFunction<String, Object, Void> errorCallback;
+    @Builder.Default
+    private int minimumValue = Integer.MIN_VALUE;
 
-    protected abstract boolean isValueValid(Object value);
+    @Builder.Default
+    private int maximumValue = Integer.MAX_VALUE;
 
-    public boolean isValid(String path, Object value) {
-        if (isValueValid(value)) {
-            return true;
-        }
+    @Override
+    protected boolean isValueValid(@NotNull Object value) {
+        Objects.requireNonNull(value);
 
-        if (errorCallback != null) {
-            errorCallback.apply(path, value);
+        if (value instanceof Integer) {
+            return isIntegerValid((int) value);
+        } else if (value instanceof String) {
+            return isStringValidInteger((String) value);
         }
 
         return false;
+    }
+
+    private boolean isStringValidInteger(@NotNull String value) {
+        Objects.requireNonNull(value);
+
+        if (!TypeUtils.isInteger(value)) {
+            return false;
+        }
+
+        int parsedValue = Integer.parseInt(value);
+        return isIntegerValid(parsedValue);
+    }
+
+    private boolean isIntegerValid(int value) {
+        return value >= minimumValue && value <= maximumValue;
     }
 }

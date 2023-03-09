@@ -20,37 +20,13 @@
 
 package org.sickskillz.charon.validators;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiFunction;
+@Getter
+@Setter
+public class DefaultValidators {
 
-@SuperBuilder
-@AllArgsConstructor
-@NoArgsConstructor
-@NotNull
-public abstract class Validator {
+    private IntegerValidator defaultIntegerValidator = new IntegerValidator();
 
-    @Getter
-    @Setter
-    protected @Nullable BiFunction<String, Object, Void> errorCallback;
-
-    protected abstract boolean isValueValid(Object value);
-
-    public boolean isValid(String path, Object value) {
-        if (isValueValid(value)) {
-            return true;
-        }
-
-        if (errorCallback != null) {
-            errorCallback.apply(path, value);
-        }
-
-        return false;
-    }
 }
