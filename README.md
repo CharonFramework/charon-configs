@@ -1,3 +1,3 @@
-# Charon
-Charon is a work in progress library that extends the Spigot YAML Configuration API.
+# Charon Configs
+Charon Configs is a work in progress library part of the Charon from. This library extends the Spigot YAML Configuration API.
 
