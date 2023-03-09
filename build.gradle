@@ -19,7 +19,7 @@ dependencies {
 
 sonarqube {
     properties {
-        property "sonar.projectKey", "CharonFramework_configs"
+        property "sonar.projectKey", "CharonFramework_charon-configs"
         property "sonar.organization", "charonframework"
         property "sonar.host.url", "https://sonarcloud.io"
     }
