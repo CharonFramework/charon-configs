@@ -21,6 +21,7 @@
 package org.sickskillz.charon.component;
 
 import dagger.Component;
+import org.sickskillz.charon.config.ConfigManager;
 import org.sickskillz.charon.module.ConfigManagerModule;
 
 import javax.inject.Singleton;
@@ -29,6 +30,6 @@ import javax.inject.Singleton;
 @Component(modules = {ConfigManagerModule.class})
 public interface ConfigManagerComponent {
 
-    void inject(ConfigManagerModule configManagerModule);
+    ConfigManager createConfigManager();
 
 }
