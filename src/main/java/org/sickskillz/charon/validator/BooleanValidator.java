@@ -18,32 +18,35 @@
  * along with Charon Configs.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.sickskillz.charon;
+package org.sickskillz.charon.validator;
 
-import org.bukkit.plugin.Plugin;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.sickskillz.charon.util.ParseUtils;
 
 import java.util.Objects;
 
-public class CharonConfigs {
+@NoArgsConstructor
+@SuperBuilder
+public class BooleanValidator extends Validator {
 
-    private CharonConfigs() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-    }
+    @Override
+    protected boolean isValueValid(@NotNull Object value) {
+        Objects.requireNonNull(value);
 
-    private static @Nullable Plugin plugin = null;
-
-    public static void init(@NotNull Plugin plugin) {
-        Objects.requireNonNull(plugin);
-        CharonConfigs.plugin = plugin;
-    }
-
-    public static @NotNull Plugin getPlugin() {
-        if (plugin == null) {
-            throw new IllegalStateException("Charon has not been initialized yet! You have to initialize it first by calling Charon.init(plugin)");
+        if (value instanceof Boolean) {
+            return true;
+        } else if (value instanceof String) {
+            return isStringValidBoolean((String) value);
         }
 
-        return plugin;
+        return false;
+    }
+
+    private boolean isStringValidBoolean(@NotNull String value) {
+        Objects.requireNonNull(value);
+
+        return ParseUtils.parseBooleanSafe(value).isPresent();
     }
 }

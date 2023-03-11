@@ -3,3 +3,44 @@
 # Charon Configs
 Charon Configs is a work in progress library part of the Charon from. This library extends the Spigot YAML Configuration API.
 
+## Gradle
+```groovy
+repositories {
+    ... 
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    ...
+    implementation 'com.github.CharonFramework:charon-configs:master-SNAPSHOT'
+}
+```
+
+## Maven
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+<dependencies>
+    <dependency>
+        <groupId>com.github.CharonFramework</groupId>
+        <artifactId>charon-configs</artifactId>
+        <version>master-SNAPSHOT</version>
+    </dependency>
+</dependencies>
+```
+
+## TODO
+- [ ] Implement validators on all getList methods
+- [ ] Override isString, isInt, etc. to use Validators and add support for custom validators
+- [ ] Make new methods that use built-in validators like getMaterial, isMaterial, getEntity, isEntity, etc.
+- [ ] Add some sort of caching system so we don't constantly re-validate values
+- [ ] Add a ConfigManager to keep configs loaded in memory and allow for easy reloading
+
+## License
+Charon Configs is licensed under the GPLv3 license. See [LICENSE](LICENSE) for more information.
+The reason for this is that Charon Configs (and the Charon Framework) relies on the Spigot API, which is licensed under the GPLv3 license.
+Although I would have liked to use a more permissive license, the GPLv3 license requires me to use the same license for any library that uses the Spigot API.

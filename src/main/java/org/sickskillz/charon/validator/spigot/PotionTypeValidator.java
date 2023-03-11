@@ -18,32 +18,35 @@
  * along with Charon Configs.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.sickskillz.charon;
+package org.sickskillz.charon.validator.spigot;
 
-import org.bukkit.plugin.Plugin;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.sickskillz.charon.validator.Validator;
 
 import java.util.Objects;
 
-public class CharonConfigs {
+@NoArgsConstructor
+@SuperBuilder
+public class PotionTypeValidator extends Validator {
 
-    private CharonConfigs() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-    }
+    @Override
+    protected boolean isValueValid(@NotNull Object value) {
+        Objects.requireNonNull(value);
 
-    private static @Nullable Plugin plugin = null;
-
-    public static void init(@NotNull Plugin plugin) {
-        Objects.requireNonNull(plugin);
-        CharonConfigs.plugin = plugin;
-    }
-
-    public static @NotNull Plugin getPlugin() {
-        if (plugin == null) {
-            throw new IllegalStateException("Charon has not been initialized yet! You have to initialize it first by calling Charon.init(plugin)");
+        if (!(value instanceof String)) {
+            return false;
         }
 
-        return plugin;
+        try {
+            EntityType.valueOf((String) value);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+
+        return true;
     }
 }
