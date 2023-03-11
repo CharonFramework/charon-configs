@@ -24,6 +24,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.sickskillz.charon.validator.Validator;
 
@@ -42,7 +43,7 @@ public class PotionTypeValidator extends Validator {
         }
 
         try {
-            EntityType.valueOf((String) value);
+            PotionType.valueOf((String) value);
         } catch (IllegalArgumentException e) {
             return false;
         }
