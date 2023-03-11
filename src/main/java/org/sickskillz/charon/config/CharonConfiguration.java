@@ -35,7 +35,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -117,6 +120,8 @@ public class CharonConfiguration extends YamlConfiguration {
         return object;
     }
 
+    // TODO: getList, getXList
+    // TODO: maybe replace isX checks as well?
     public @NotNull Optional<Object> get(@NotNull String path, @NotNull Validator validator) {
         Objects.requireNonNull(path);
         Objects.requireNonNull(validator);
@@ -140,10 +145,121 @@ public class CharonConfiguration extends YamlConfiguration {
     @Override
     public int getInt(@NotNull String path, int def) {
         Objects.requireNonNull(path);
-        Optional<Object> value = this.get(path, defaultValidators.getDefaultIntegerValidator());
+        Optional<Object> optValue = this.get(path, defaultValidators.getDefaultIntegerValidator());
 
-        return value.map(o -> (int) o).orElse(def);
+        if (optValue.isPresent()) {
+            Object value = optValue.get();
 
+            if (value instanceof String) {
+                return Integer.parseInt((String) value);
+            } else if (value instanceof Integer) {
+                return (Integer) value;
+            }
+        }
+
+        return def;
+    }
+
+    @Override
+    public long getLong(@NotNull String path) {
+        Objects.requireNonNull(path);
+
+        return this.getLong(path, 0);
+    }
+
+    @Override
+    public long getLong(@NotNull String path, long def) {
+        Objects.requireNonNull(path);
+        Optional<Object> optValue = this.get(path, defaultValidators.getDefaultLongValidator());
+
+        if (optValue.isPresent()) {
+            Object value = optValue.get();
+
+            if (value instanceof String) {
+                return Long.parseLong((String) value);
+            } else if (value instanceof Long) {
+                return (Long) value;
+            }
+        }
+
+        return def;
+    }
+
+    @Override
+    public double getDouble(@NotNull String path) {
+        Objects.requireNonNull(path);
+
+        return this.getDouble(path, 0);
+    }
+
+    @Override
+    public double getDouble(@NotNull String path, double def) {
+        Objects.requireNonNull(path);
+        Optional<Object> optValue = this.get(path, defaultValidators.getDefaultDoubleValidator());
+
+        if (optValue.isPresent()) {
+            Object value = optValue.get();
+
+            if (value instanceof Double) {
+                return (Double) value;
+            } else if (value instanceof Float || value instanceof Integer) {
+                return ((Number) value).doubleValue();
+            } else if (value instanceof String) {
+                return Double.parseDouble((String) value);
+            }
+        }
+
+        return def;
+    }
+
+    @Override
+    public boolean getBoolean(@NotNull String path) {
+        Objects.requireNonNull(path);
+
+        return this.getBoolean(path, false);
+    }
+
+    @Override
+    public boolean getBoolean(@NotNull String path, boolean def) {
+        Objects.requireNonNull(path);
+        Optional<Object> optValue = this.get(path, defaultValidators.getDefaultBooleanValidator());
+
+        if (optValue.isPresent()) {
+            Object value = optValue.get();
+
+            if (value instanceof Boolean) {
+                return (Boolean) value;
+            } else if (value instanceof String) {
+                return Boolean.parseBoolean((String) value);
+            }
+        }
+
+        return def;
+    }
+
+    @Override
+    public String getString(@NotNull String path) {
+        Objects.requireNonNull(path);
+
+        return this.getString(path, null);
+    }
+
+    @Override
+    public String getString(@NotNull String path, String def) {
+        Objects.requireNonNull(path);
+        Optional<Object> optValue = this.get(path, defaultValidators.getDefaultStringValidator());
+
+        if (optValue.isPresent()) {
+            Object value = optValue.get();
+
+            if (value instanceof String) {
+                return (String) value;
+            } else {
+                return value.toString();
+            }
+        }
+
+        return def;
     }
 
     public @NotNull List<String> updateConfig() {

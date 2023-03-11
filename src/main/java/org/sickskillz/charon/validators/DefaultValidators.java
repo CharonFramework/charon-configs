@@ -27,6 +27,14 @@ import lombok.Setter;
 @Setter
 public class DefaultValidators {
 
-    private IntegerValidator defaultIntegerValidator = new IntegerValidator();
+    private Validator defaultIntegerValidator = new IntegerValidator();
+
+    private Validator defaultDoubleValidator = new DoubleValidator();
+
+    private Validator defaultLongValidator = new LongValidator();
+
+    private Validator defaultBooleanValidator = new BooleanValidator();
+
+    private Validator defaultStringValidator = new StringValidator();
 
 }

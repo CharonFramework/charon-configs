@@ -18,26 +18,36 @@
  * along with Charon.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.sickskillz.charon.utils;
+package org.sickskillz.charon.validators;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.sickskillz.charon.utils.ParseUtils;
 
 import java.util.Objects;
 
-public class TypeUtils {
+@NoArgsConstructor
+@SuperBuilder
+public class BooleanValidator extends Validator {
 
-    private TypeUtils() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    @Override
+    protected boolean isValueValid(@NotNull Object value) {
+        Objects.requireNonNull(value);
+
+        if (value instanceof Boolean) {
+            return true;
+        } else if (value instanceof String) {
+            return isStringValidBoolean((String) value);
+        }
+
+        return false;
     }
 
-    public static boolean isInteger(@NotNull String input) {
-        Objects.requireNonNull(input);
+    private boolean isStringValidBoolean(@NotNull String value) {
+        Objects.requireNonNull(value);
 
-        try {
-            Integer.parseInt(input);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+        return ParseUtils.parseBooleanSafe(value).isPresent();
     }
 }

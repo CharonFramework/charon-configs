@@ -32,36 +32,36 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class IntegerValidator extends Validator {
+public class DoubleValidator extends Validator {
 
     @Builder.Default
-    private int minimumValue = Integer.MIN_VALUE;
+    private double minimumValue = Double.MIN_VALUE;
 
     @Builder.Default
-    private int maximumValue = Integer.MAX_VALUE;
+    private double maximumValue = Double.MAX_VALUE;
 
     @Override
     protected boolean isValueValid(@NotNull Object value) {
         Objects.requireNonNull(value);
 
-        if (value instanceof Integer) {
-            return isIntegerValid((int) value);
+        if (value instanceof Double) {
+            return isDoubleValid((double) value);
         } else if (value instanceof String) {
-            return isStringValidInteger((String) value);
+            return isStringValidDouble((String) value);
         }
 
         return false;
     }
 
-    private boolean isStringValidInteger(@NotNull String value) {
+    private boolean isStringValidDouble(@NotNull String value) {
         Objects.requireNonNull(value);
 
-        return ParseUtils.parseIntSafe(value)
-                .map(this::isIntegerValid)
+        return ParseUtils.parseDoubleSafe(value)
+                .map(this::isDoubleValid)
                 .orElse(false);
     }
 
-    private boolean isIntegerValid(int value) {
+    private boolean isDoubleValid(double value) {
         return value >= minimumValue && value <= maximumValue;
     }
 }
