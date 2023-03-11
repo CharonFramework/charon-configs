@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -120,9 +121,7 @@ public class CharonConfiguration extends YamlConfiguration {
         return object;
     }
 
-    // TODO: getList, getXList
     // TODO: maybe replace isX checks as well?
-    // TODO method for getMaterial, getEntity etc. Basically all Spigot validators
     public @NotNull Optional<Object> get(@NotNull String path, @NotNull Validator validator) {
         Objects.requireNonNull(path);
         Objects.requireNonNull(validator);
@@ -134,6 +133,27 @@ public class CharonConfiguration extends YamlConfiguration {
         }
 
         return Optional.empty();
+    }
+
+    public Optional<List<Object>> getList(@NotNull String path, @NotNull Validator validator) {
+        Objects.requireNonNull(path);
+        Objects.requireNonNull(validator);
+
+        List<?> configList = this.getList(path);
+
+        if (configList == null) {
+            return Optional.empty();
+        }
+
+        List<Object> list = new ArrayList<>(configList);
+
+        for (Object object : list) {
+            if (!validator.isValid(path, object)) {
+                return Optional.empty();
+            }
+        }
+
+        return Optional.of(list);
     }
 
     @Override
@@ -162,6 +182,34 @@ public class CharonConfiguration extends YamlConfiguration {
     }
 
     @Override
+    public @NotNull List<Integer> getIntegerList(@NotNull String path) {
+        Objects.requireNonNull(path);
+        Optional<List<Object>> optList = this.getList(path, defaultValidators.getDefaultIntegerValidator());
+
+        return optList.map(objects -> objects.stream().map(o -> (Integer) o)
+                .collect(Collectors.toList()))
+                .orElseGet(ArrayList::new);
+
+    }
+
+    public Optional<Integer> getIntOptional(@NotNull String path) {
+        Objects.requireNonNull(path);
+        Optional<Object> optValue = this.get(path, defaultValidators.getDefaultIntegerValidator());
+
+        if (optValue.isPresent()) {
+            Object value = optValue.get();
+
+            if (value instanceof String) {
+                return Optional.of(Integer.parseInt((String) value));
+            } else if (value instanceof Integer) {
+                return Optional.of((Integer) value);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
     public long getLong(@NotNull String path) {
         Objects.requireNonNull(path);
 
@@ -184,6 +232,33 @@ public class CharonConfiguration extends YamlConfiguration {
         }
 
         return def;
+    }
+
+    public Optional<Long> getLongOptional(@NotNull String path) {
+        Objects.requireNonNull(path);
+        Optional<Object> optValue = this.get(path, defaultValidators.getDefaultLongValidator());
+
+        if (optValue.isPresent()) {
+            Object value = optValue.get();
+
+            if (value instanceof String) {
+                return Optional.of(Long.parseLong((String) value));
+            } else if (value instanceof Long) {
+                return Optional.of((Long) value);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public @NotNull List<Long> getLongList(@NotNull String path) {
+        Objects.requireNonNull(path);
+        Optional<List<Object>> optList = this.getList(path, defaultValidators.getDefaultLongValidator());
+
+        return optList.map(objects -> objects.stream().map(o -> (Long) o)
+                .collect(Collectors.toList()))
+                .orElseGet(ArrayList::new);
     }
 
     @Override
@@ -213,6 +288,35 @@ public class CharonConfiguration extends YamlConfiguration {
         return def;
     }
 
+    public Optional<Double> getDoubleOptional(@NotNull String path) {
+        Objects.requireNonNull(path);
+        Optional<Object> optValue = this.get(path, defaultValidators.getDefaultDoubleValidator());
+
+        if (optValue.isPresent()) {
+            Object value = optValue.get();
+
+            if (value instanceof Double) {
+                return Optional.of((Double) value);
+            } else if (value instanceof Float || value instanceof Integer) {
+                return Optional.of(((Number) value).doubleValue());
+            } else if (value instanceof String) {
+                return Optional.of(Double.parseDouble((String) value));
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public @NotNull List<Double> getDoubleList(@NotNull String path) {
+        Objects.requireNonNull(path);
+        Optional<List<Object>> optList = this.getList(path, defaultValidators.getDefaultDoubleValidator());
+
+        return optList.map(objects -> objects.stream().map(o -> (Double) o)
+                .collect(Collectors.toList()))
+                .orElseGet(ArrayList::new);
+    }
+
     @Override
     public boolean getBoolean(@NotNull String path) {
         Objects.requireNonNull(path);
@@ -238,6 +342,33 @@ public class CharonConfiguration extends YamlConfiguration {
         return def;
     }
 
+    public Optional<Boolean> getBooleanOptional(@NotNull String path) {
+        Objects.requireNonNull(path);
+        Optional<Object> optValue = this.get(path, defaultValidators.getDefaultBooleanValidator());
+
+        if (optValue.isPresent()) {
+            Object value = optValue.get();
+
+            if (value instanceof Boolean) {
+                return Optional.of((Boolean) value);
+            } else if (value instanceof String) {
+                return Optional.of(Boolean.parseBoolean((String) value));
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public @NotNull List<Boolean> getBooleanList(@NotNull String path) {
+        Objects.requireNonNull(path);
+        Optional<List<Object>> optList = this.getList(path, defaultValidators.getDefaultBooleanValidator());
+
+        return optList.map(objects -> objects.stream().map(o -> (Boolean) o)
+                .collect(Collectors.toList()))
+                .orElseGet(ArrayList::new);
+    }
+
     @Override
     public String getString(@NotNull String path) {
         Objects.requireNonNull(path);
@@ -261,6 +392,33 @@ public class CharonConfiguration extends YamlConfiguration {
         }
 
         return def;
+    }
+
+    public Optional<String> getStringOptional(@NotNull String path) {
+        Objects.requireNonNull(path);
+        Optional<Object> optValue = this.get(path, defaultValidators.getDefaultStringValidator());
+
+        if (optValue.isPresent()) {
+            Object value = optValue.get();
+
+            if (value instanceof String) {
+                return Optional.of((String) value);
+            } else {
+                return Optional.of(value.toString());
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public @NotNull List<String> getStringList(@NotNull String path) {
+        Objects.requireNonNull(path);
+        Optional<List<Object>> optList = this.getList(path, defaultValidators.getDefaultStringValidator());
+
+        return optList.map(objects -> objects.stream().map(o -> (String) o)
+                .collect(Collectors.toList()))
+                .orElseGet(ArrayList::new);
     }
 
     public @NotNull List<String> updateConfig() {

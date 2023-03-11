@@ -20,10 +20,8 @@
 
 package org.sickskillz.charon.validator.spigot;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.sickskillz.charon.validator.Validator;
