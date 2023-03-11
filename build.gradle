@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'java-library'
-    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id "org.sonarqube" version "3.5.0.2730"
 }
@@ -32,23 +31,5 @@ sonarqube {
         property "sonar.projectKey", "CharonFramework_charon-configs"
         property "sonar.organization", "charonframework"
         property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/CharonFramework/charon-configs")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-    publications {
-        gpr(MavenPublication) {
-            from(components.java)
-        }
     }
 }
