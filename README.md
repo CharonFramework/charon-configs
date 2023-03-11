@@ -33,12 +33,11 @@ dependencies {
 </dependencies>
 ```
 
-## TODO
+## Roadmap
 - [x] Implement validators on all getList methods
-- [ ] Override isString, isInt, etc. to use Validators and add support for custom validators
 - [x] Make new methods that use built-in validators like getMaterial, isMaterial, getEntity, isEntity, etc.
+- [x] Add a ConfigManager to keep configs loaded in memory and allow for easy reloading
 - [ ] Add some sort of caching system so we don't constantly re-validate values
-- [ ] Add a ConfigManager to keep configs loaded in memory and allow for easy reloading
 
 ## License
 Charon Configs is licensed under the GPLv3 license. See [LICENSE](LICENSE) for more information.

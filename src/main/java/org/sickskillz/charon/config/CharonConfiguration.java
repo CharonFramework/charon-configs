@@ -445,4 +445,12 @@ public class CharonConfiguration extends YamlConfiguration {
 
         return updatedKeys;
     }
+
+    public void save() {
+        try {
+            this.save(configFile);
+        } catch (IOException e) {
+            throw new ConfigUpdateException("Unable to save the config for an unknown reason! " + e);
+        }
+    }
 }
